@@ -1,11 +1,14 @@
 {
   "name": "te-net-load-testing",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Scalable customer creation load testing script",
+  "main": "src/index.js",
   "scripts": {
-    "test": "test"
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "echo \"No tests yet\" && exit 0"
   },
+  "keywords": ["load-testing", "api-testing", "customer-creation"],
   "author": "",
   "license": "ISC",
   "dependencies": {
