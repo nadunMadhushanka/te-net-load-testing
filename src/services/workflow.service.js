@@ -1,6 +1,7 @@
 const customerService = require('./customer.service');
 const productService = require('./product.service');
 const referralDataService = require('./referralData.service');
+const dataLoggerService = require('./dataLogger.service');
 const logger = require('../utils/logger.util');
 
 /**
@@ -66,6 +67,9 @@ class WorkflowService {
   async bulkCustomerCreation(count) {
     logger.info(`Starting bulk customer creation: ${count} customers\n`);
 
+    // Initialize data logger session
+    dataLoggerService.initializeSession(count);
+
     // Show referral data statistics
     const stats = referralDataService.getStatistics();
     logger.info('Referral Data Statistics:');
@@ -114,6 +118,9 @@ class WorkflowService {
         });
       }
     }
+
+    // Finalize and save session data
+    dataLoggerService.finalizeSession(results);
 
     // Display summary
     this.displaySummary(results);

@@ -3,6 +3,7 @@ const apiConfig = require('../config/api.config');
 const Customer = require('../models/customer.model');
 const productService = require('./product.service');
 const referralDataService = require('./referralData.service');
+const dataLoggerService = require('./dataLogger.service');
 const logger = require('../utils/logger.util');
 
 /**
@@ -103,6 +104,9 @@ class CustomerService {
     } else {
       logger.info(`⏭️  Skipping product purchase - No referral value for index ${customerIndex}`);
     }
+
+    // Log workflow data to JSON file
+    dataLoggerService.logCustomerWorkflow(customerIndex, customer, result);
 
     return result;
   }
