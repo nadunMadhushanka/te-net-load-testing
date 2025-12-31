@@ -9,7 +9,7 @@ class HttpClientService {
   constructor() {
     this.client = axios.create({
       baseURL: apiConfig.baseUrl,
-      timeout: apiConfig.timeout,
+    //   timeout: apiConfig.timeout,
       headers: {
         'Content-Type': 'application/json'
       }
