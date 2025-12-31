@@ -1,13 +1,38 @@
 const httpClient = require('./httpClient.service');
 const apiConfig = require('../config/api.config');
 const Customer = require('../models/customer.model');
+const productService = require('./product.service');
+const referralDataService = require('./referralData.service');
 const logger = require('../utils/logger.util');
 
 /**
  * Customer Service
- * Single Responsibility: Handle customer-related business logic
+ * Single Responsibility: Handle customer-related operations only
  */
 class CustomerService {
+  constructor() {
+    // Hardcoded product purchases: [customerId, productId, customerId, productId, ...]
+    this.productPurchases = [
+      1
+    ];
+  }
+
+  /**
+   * Get random product ID from the list
+   * @returns {number} Random product ID
+   */
+  getRandomProductId() {
+    const productIds = [];
+    for (let i = 0; i < this.productPurchases.length; i += 1) {
+      productIds.push(this.productPurchases[i]);
+    }
+    
+    // Return random product ID
+    const randomIndex = Math.floor(Math.random() * productIds.length);
+    return productIds[randomIndex];
+  }
+
+
   /**
    * Create a single customer
    * @param {Customer} customer - Customer object
@@ -15,7 +40,7 @@ class CustomerService {
    */
   async createCustomer(customer) {
     const endpoint = apiConfig.getCustomerCreateEndpoint();
-    logger.info(`Creating customer: ${customer.email}`);
+    logger.info(`👤 Creating customer: ${customer.email}`);
     logger.debug('Request data:', customer.toJSON());
 
     const response = await httpClient.post(endpoint, customer.toJSON());
@@ -32,50 +57,54 @@ class CustomerService {
   }
 
   /**
-   * Create multiple customers
-   * @param {number} count - Number of customers to create
-   * @returns {Promise<object>} Summary of results
+   * Process customer creation with product purchase workflow
+   * @param {number} customerIndex - Customer index
+   * @returns {Promise<object>} Workflow result
    */
-  async createMultipleCustomers(count) {
-    logger.info(`Starting bulk customer creation: ${count} customers\n`);
+  async processCustomer(customerIndex) {
+    const customer = Customer.generateTestCustomer(customerIndex);
+    
+    logger.info(`Referral ID: ${customer.referral_id}`);
 
-    const results = {
-      total: count,
-      successful: 0,
-      failed: 0,
-      errors: []
+    const result = {
+      customerCreated: false,
+      productPurchased: false,
+      customerResponse: null,
+      productResponse: null
     };
 
-    for (let i = 1; i <= count; i++) {
-      const customer = Customer.generateTestCustomer(i);
+    // Create customer
+    const customerResponse = await this.createCustomer(customer);
+    result.customerResponse = customerResponse;
 
-      logger.info(`\n--- Creating Customer ${i}/${count} (Referral: ${customer.referral_id}) ---`);
-
-      const response = await this.createCustomer(customer);
-
-      if (response.success) {
-        results.successful++;
-      } else {
-        results.failed++;
-        results.errors.push({
-          customerIndex: i,
-          email: customer.email,
-          error: response.error
-        });
-      }
+    if (!customerResponse.success) {
+      return result;
     }
 
-    logger.info(`\n${'='.repeat(50)}`);
-    logger.info('BULK CREATION SUMMARY');
-    logger.info(`${'='.repeat(50)}`);
-    logger.info(`Total: ${results.total}`);
-    logger.success(`Successful: ${results.successful}`);
-    if (results.failed > 0) {
-      logger.error(`Failed: ${results.failed}`);
-    }
-    logger.info(`${'='.repeat(50)}\n`);
+    result.customerCreated = true;
 
-    return results;
+    // Check if customer has a value in referral data
+    const hasReferralValue = referralDataService.hasAssignedValue(customerIndex);
+
+    if (hasReferralValue) {
+      logger.info(`📌 Index ${customerIndex} has referral value`);
+      
+      // Get random product ID from hardcoded list
+      const productId = this.getRandomProductId();
+      logger.info(`🎲 Selected random product ID: ${productId}`);
+      
+      const productResponse = await productService.createProductPurchase(
+        customerIndex,
+        productId
+      );
+      
+      result.productResponse = productResponse;
+      result.productPurchased = productResponse.success;
+    } else {
+      logger.info(`⏭️  Skipping product purchase - No referral value for index ${customerIndex}`);
+    }
+
+    return result;
   }
 }
 

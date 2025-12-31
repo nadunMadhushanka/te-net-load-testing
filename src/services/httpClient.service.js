@@ -7,9 +7,15 @@ const apiConfig = require('../config/api.config');
  */
 class HttpClientService {
   constructor() {
-    this.client = axios.create({
-      baseURL: apiConfig.baseUrl,
-    //   timeout: apiConfig.timeout,
+    this.customerClient = axios.create({
+      baseURL: apiConfig.getCustomerApiUrl(),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    this.productClient = axios.create({
+      baseURL: apiConfig.getProductApiUrl(),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -20,11 +26,21 @@ class HttpClientService {
    * Send POST request
    * @param {string} endpoint - API endpoint
    * @param {object} data - Request body
+   * @param {string} apiType - 'customer' or 'product' (default: 'customer')
    * @returns {Promise<object>} Response data
    */
-  async post(endpoint, data) {
+  async post(endpoint, data, apiType = 'customer') {
+
     try {
-      const response = await this.client.post(endpoint, data);
+      const client = apiType === 'product' ? this.productClient : this.customerClient;
+      const baseURL = apiType === 'product' ? apiConfig.getProductApiUrl() : apiConfig.getCustomerApiUrl();
+      const fullURL = `${baseURL}${endpoint}`;
+      
+      console.log('🌐 POST Request URL:', fullURL);
+      console.log('📦 Request Data:', data);
+      console.log('🔧 API Type:', apiType);
+      
+      const response = await client.post(endpoint, data);
       return {
         success: true,
         status: response.status,
@@ -46,7 +62,7 @@ class HttpClientService {
    */
   async get(endpoint) {
     try {
-      const response = await this.client.get(endpoint);
+      const response = await this.customerClient.get(endpoint);
       return {
         success: true,
         status: response.status,

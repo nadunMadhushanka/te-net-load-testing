@@ -6,7 +6,8 @@ require('dotenv').config();
  */
 class ApiConfig {
   constructor() {
-    this.baseUrl = process.env.API_URL || 'http://localhost:8000';
+    this.customerApiUrl = process.env.CUSTOMER_API_URL || 'http://localhost:8000';
+    this.productApiUrl = process.env.PRODUCT_API_URL || 'http://localhost:8080';
     this.timeout = process.env.API_TIMEOUT || 5000;
   }
 
@@ -14,8 +15,20 @@ class ApiConfig {
     return '/api/testing/customer/create';
   }
 
+  getProductPurchaseEndpoint() {
+    return '/api/test/product-purchase';
+  }
+
+  getCustomerApiUrl() {
+    return this.customerApiUrl;
+  }
+
+  getProductApiUrl() {
+    return this.productApiUrl;
+  }
+
   getFullUrl(endpoint) {
-    return `${this.baseUrl}${endpoint}`;
+    return `${this.customerApiUrl}${endpoint}`;
   }
 }
 
