@@ -7,7 +7,7 @@ require('dotenv').config();
 class ApiConfig {
   constructor() {
     this.customerApiUrl = process.env.CUSTOMER_API_URL || 'http://localhost:8000';
-    this.productApiUrl = process.env.PRODUCT_API_URL || 'http://localhost:8080';
+    this.productApiUrl = process.env.PRODUCT_API_URL || 'http://localhost:9000';
     this.timeout = process.env.API_TIMEOUT || 5000;
   }
 

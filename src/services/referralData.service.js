@@ -22,6 +22,9 @@ class ReferralDataService {
 
     try {
       const filePath = path.join(__dirname, '../../referral-data1000.json');
+      // const filePath = path.join(__dirname, '../../referral-data100.json');
+      // const filePath = path.join(__dirname, '../../referral-data50.json');
+      // const filePath = path.join(__dirname, '../../referral-data20.json');
       // const filePath = path.join(__dirname, '../../referral-data10000.json');
       // const filePath = path.join(__dirname, '../../referral-data100000.json');
       // const filePath = path.join(__dirname, '../../referral-data5000.json');
