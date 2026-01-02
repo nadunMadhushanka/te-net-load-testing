@@ -21,7 +21,10 @@ class ReferralDataService {
     }
 
     try {
-      const filePath = path.join(__dirname, '../../referral-data.json');
+      const filePath = path.join(__dirname, '../../referral-data1000.json');
+      // const filePath = path.join(__dirname, '../../referral-data10000.json');
+      // const filePath = path.join(__dirname, '../../referral-data100000.json');
+      // const filePath = path.join(__dirname, '../../referral-data5000.json');
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       this.referralData = JSON.parse(fileContent);
       logger.info('✓ Referral data loaded successfully');
